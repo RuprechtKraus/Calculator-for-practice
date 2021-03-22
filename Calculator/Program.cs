@@ -22,7 +22,7 @@ namespace Calculator
             RPN.MakeReversePolishNotation(expression, out List<string> RevPolishNotation);
             float result = RPN.Calculate(RevPolishNotation);
 
-            Console.WriteLine("Result: " + result); 
+            Console.WriteLine("Result: {0}", result); 
         }
     }
 }
