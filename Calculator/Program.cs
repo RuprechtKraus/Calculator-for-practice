@@ -6,6 +6,17 @@ namespace Calculator
 {
     class Program
     {
+
+        static readonly List<string> opLevelOne = new()
+        {
+            "*",
+            "/"
+        };
+        static readonly List<string> opLevelTwo = new()
+        {
+            "+",
+            "-"
+        };
         static List<string> ExpressionToList(string expression)
         {
             List<string> expr = new();
@@ -29,42 +40,20 @@ namespace Calculator
             expr.RemoveAll(item => item == "");
             return expr;
         }
-
-        static void Main(string[] args)
+        static void MakeReversePolishNotation(List<string> expression, out List<string> result)
         {
-            List<string> opLevelOne = new();
-            opLevelOne.Add("*");
-            opLevelOne.Add("/");
-            List<string> opLevelTwo = new();
-            opLevelTwo.Add("+");
-            opLevelTwo.Add("-");
-            List<string> expression = new();
-            List<string> output = new();
+            result = new();
             Stack<string> operations = new();
-
-            string inputString = Console.ReadLine();
-            //Проверка выражения на верную структуру
-            if (!Regex.IsMatch(inputString, @"[^()0-9*/+-]|[*/+-]{2,}"))//&& 
-                //char.IsDigit(inputString[0]) &&
-                //char.IsDigit(inputString[inputString.Length - 1]))
-            {
-                expression = ExpressionToList(inputString);
-            }
-            else
-            {
-                Console.WriteLine("Invalid input");
-                Environment.Exit(13);
-            }
 
             foreach (var item in expression)
             {
                 if (float.TryParse(item, out _))
                 {
-                    output.Add(item);
+                    result.Add(item);
                     continue;
                 }
 
-                if (item == "(")
+                if (operations.Count == 0 || item == "(")
                 {
                     operations.Push(item);
                     continue;
@@ -75,75 +64,50 @@ namespace Calculator
                     string op = operations.Pop();
                     while (op != "(")
                     {
-                        output.Add(op);
+                        result.Add(op);
                         op = operations.Pop();
                     }
                     continue;
                 }
 
-                if (opLevelOne.Contains(item) || opLevelTwo.Contains(item))
+                string operation = operations.Peek();
+                if (operation != "(")
                 {
-                    if (operations.Count == 0)
+                    if (opLevelTwo.Contains(item) ||
+                       (opLevelOne.Contains(item) && opLevelOne.Contains(operation)))
                     {
+                        result.Add(operations.Pop());
                         operations.Push(item);
                         continue;
                     }
 
-                    string operation = operations.Peek();
-                    if (opLevelTwo.Contains(item) && (opLevelOne.Contains(operation) || opLevelTwo.Contains(operation)) &&
-                        operation != "(")
-                    {
-                        output.Add(operations.Pop());
-                        operations.Push(item);
-                        continue;
-                    }
-
-                    if (opLevelOne.Contains(item) && opLevelTwo.Contains(operation) &&
-                        operation != "(")
+                    if (opLevelOne.Contains(item) && opLevelTwo.Contains(operation))
                     {
                         operations.Push(item);
                         continue;
                     }
-
-                    if (opLevelOne.Contains(item) && opLevelOne.Contains(operation) &&
-                        operation != "(")
-                    {
-                        output.Add(operations.Pop());
-                        operations.Push(item);
-                        continue;
-                    }
-
-                    if (operation != "(")
-                    {
-                        output.Add(item);
-                    }
-                    else
-                    {
-                        operations.Push(item);
-                    }
+                }
+                else
+                {
+                    operations.Push(item);
+                    continue;
                 }
             }
 
             while (operations.Count > 0)
-            {
-                output.Add(operations.Pop());
-            }
-
-            #region Вывод стека
-            //Console.Write("Output: ");
-            //output.ForEach(item => Console.Write(item + " "));
-            //Console.WriteLine();
-            #endregion
-
+                result.Add(operations.Pop());
+        }
+        static float Calculate(List<string> ReversePolishNotation)
+        {
             List<string> result = new();
             float leftOp = 0;
             float rightOp = 0;
-            foreach (var item in output)
+            foreach (var item in ReversePolishNotation)
             {
                 if (!float.TryParse(item, out _))
                 {
-                    leftOp = float.Parse(result[result.Count - 2]);
-                    rightOp = float.Parse(result[result.Count - 1]);
+                    leftOp = float.Parse(result[^2]);
+                    rightOp = float.Parse(result[^1]);
                     result.RemoveAt(result.Count - 2);
                     result.RemoveAt(result.Count - 1);
                 }
@@ -168,7 +132,26 @@ namespace Calculator
                 }
             }
 
-            Console.WriteLine("Result: " + result[0]); 
+            return float.Parse(result[0]);
+        }
+
+        static void Main(string[] args)
+        {
+            List<string> expression;
+            string inputString = Console.ReadLine();
+
+            /* Проверка выражения на верную структуру */
+            if (Regex.IsMatch(inputString, @"[^()0-9*/+-]|[*/+-]{2,}|\A[*/+-]|[*/+-]\z"))
+            {
+                Console.WriteLine("Invalid input");
+                Environment.Exit(13);
+            }
+
+            expression = ExpressionToList(inputString);
+            MakeReversePolishNotation(expression, out List<string> RevPolishNotation);
+            float result = Calculate(RevPolishNotation);
+
+            Console.WriteLine("Result: " + result); 
         }
     }
 }
