@@ -19,30 +19,6 @@ namespace Calculator
             "-"
         };
 
-        static public List<string> ExpressionToList(string expression)
-        {
-            List<string> expr = new();
-            int lastNumberCell = 0;
-
-            expr.Add("");
-            for (int i = 0; i < expression.Length; i++)
-            {
-                if (char.IsDigit(expression[i]))
-                {
-                    expr[lastNumberCell] += expression[i];
-                }
-                else
-                {
-                    expr.Add(expression[i].ToString());
-                    expr.Add("");
-                    lastNumberCell = expr.Count - 1;
-                }
-            }
-
-            expr.RemoveAll(item => item == "");
-            return expr;
-        }
-
         static public void MakeReversePolishNotation(List<string> expression, out List<string> result)
         {
             result = new();
