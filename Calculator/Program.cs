@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using CalculatorLib;
 
 namespace Calculator
 {
@@ -32,7 +33,9 @@ namespace Calculator
 
         static void Main(string[] args)
         {
-            List<string> expression;
+            RPN rpn = new();
+            RCalculator MyCalc = new(rpn);
+
             string inputString = Console.ReadLine();
 
             /* Проверка выражения на верную структуру */
@@ -42,11 +45,18 @@ namespace Calculator
                 Environment.Exit(13);
             }
 
-            expression = ExpressionToList(inputString);
-            RPN.MakeReversePolishNotation(expression, out List<string> RevPolishNotation);
-            float result = RPN.Calculate(RevPolishNotation);
+            float result = 0;
+            try
+            {
+                result = MyCalc.Calculate(inputString);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Environment.Exit(-1);
+            }
 
-            Console.WriteLine("Result: {0}", result); 
+            Console.WriteLine("Result: {0}", result);
         }
     }
 }
