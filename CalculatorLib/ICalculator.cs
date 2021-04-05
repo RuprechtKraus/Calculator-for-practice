@@ -8,6 +8,6 @@ namespace CalculatorLib
 {
     public interface ICalculator
     {
-        float Calculate(string expression);
+        float Calculate(float left, float right, string operation);
     }
 }

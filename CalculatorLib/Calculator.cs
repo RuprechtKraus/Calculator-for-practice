@@ -5,17 +5,26 @@ namespace CalculatorLib
 {
     public class RCalculator : ICalculator
     {
-        private readonly IParser _parser;
+        //private readonly IParser _parser;
 
-        public RCalculator(IParser parser)
+        private readonly List<IOperation> _availableOperations;
+
+        public RCalculator(List<IOperation> operations)
         {
-            _parser = parser;
+            _availableOperations = operations;
         }
 
-        public float Calculate(string expression)
+        public float Calculate(float left, float right, string operation)
         {
-            _parser.Parse(expression);
-            return _parser.Calculate();
+            IOperation _operation = _availableOperations.Find(x => x.OperationCode == operation);
+            if (_operation != null)
+            {
+                return _operation.Apply(left, right);
+            }
+            else
+            {
+                throw new InvalidOperationException($"Operation {operation} isn't supported");
+            }
         }
     }
 }

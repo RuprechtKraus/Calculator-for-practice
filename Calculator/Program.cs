@@ -33,8 +33,14 @@ namespace Calculator
 
         static void Main(string[] args)
         {
-            ReversePolishNotation rpn = new();
-            RCalculator MyCalc = new(rpn);
+            ReversePolishNotation rpn = new ReversePolishNotation();
+            RCalculator MyCalc = new RCalculator(new List<IOperation>() 
+            { 
+                new Addition(),
+                new Substraction(),
+                new Multiplication(),
+                new Division()
+            });
 
             string inputString = Console.ReadLine();
             /* Проверка выражения на верную структуру */
@@ -44,17 +50,43 @@ namespace Calculator
                 Environment.Exit(-1);
             }
 
+            rpn.Parse(inputString);
+            List<string> parsedExpression = rpn.RpnExpression;
+            List<string> executionList = new List<string>();
+            float leftOp = 0;
+            float rightOp = 0;
             float result = 0;
-            try
+            string operation = "";
+
+            foreach (var item in parsedExpression)
             {
-                result = MyCalc.Calculate(inputString);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                Environment.Exit(-1);
+                if (!float.TryParse(item, out _)) //Если item не парсится во float, то item это символ операции
+                {
+                    leftOp = float.Parse(executionList[^2]);
+                    rightOp = float.Parse(executionList[^1]);
+                    operation = item;
+
+                    executionList.RemoveAt(executionList.Count - 2);
+                    executionList.RemoveAt(executionList.Count - 1);
+
+                    try
+                    {
+                        result = MyCalc.Calculate(leftOp, rightOp, operation);
+                    }
+                    catch (InvalidOperationException e)
+                    {
+                        Console.WriteLine(e.Message);
+                        Environment.Exit(-1);
+                    }
+                    executionList.Add(result.ToString());
+                }
+                else
+                {
+                    executionList.Add(item);
+                }
             }
 
+            result = float.Parse(executionList[0]);
             Console.WriteLine("Result: {0}", result);
         }
     }

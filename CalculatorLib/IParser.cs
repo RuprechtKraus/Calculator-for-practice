@@ -8,7 +8,6 @@ namespace CalculatorLib
 {
     public interface IParser
     {
-        public abstract void Parse(string expression);
-        public abstract float Calculate();
+        public void Parse(string expression);
     }
 }

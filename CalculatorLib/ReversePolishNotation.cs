@@ -8,25 +8,27 @@ namespace CalculatorLib
 {
     public class ReversePolishNotation : IParser
     {
-        static readonly List<string> opLevelOne = new()
+        static readonly List<string> opLevelOne = new List<string>()
         {
             "*",
             "/"
         };
-        static readonly List<string> opLevelTwo = new()
+        static readonly List<string> opLevelTwo = new List<string>()
         {
             "+",
             "-"
         };
 
-        private List<string> _rpnExpression = new();
-        private readonly List<IOperation> _supportedOperations = new()
+        private List<string> _rpnExpression = new List<string>();
+        private readonly List<IOperation> _supportedOperations = new List<IOperation>()
         { 
             new Addition(),
             new Substraction(),
             new Multiplication(),
             new Division()
         };
+
+        public List<string> RpnExpression => _rpnExpression;
 
         public ReversePolishNotation() { }
         public ReversePolishNotation(List<IOperation> operations)
@@ -61,7 +63,7 @@ namespace CalculatorLib
         public void Parse(string expression)
         {
             List<string> expr = ExpressionToList(expression);
-            _rpnExpression = new();
+            _rpnExpression = new List<string>();
             Stack<string> operations = new();
 
             foreach (var item in expr)
@@ -70,12 +72,6 @@ namespace CalculatorLib
                 {
                     _rpnExpression.Add(item);
                     continue;
-                }
-
-                if (_supportedOperations.Find(x => x.OperationCode == item) == null
-                    && item != "(" && item != ")") //Поддерживается ли данная операция
-                {
-                    throw new Exception($"Operation {item} is not supported");
                 }
 
                 if (operations.Count == 0 || item == "(")
@@ -121,36 +117,6 @@ namespace CalculatorLib
 
             while (operations.Count > 0)
                 _rpnExpression.Add(operations.Pop());
-        }
-
-        public float Calculate()
-        {
-            List<string> result = new();
-            IOperation operation;
-            float leftOp = 0;
-            float rightOp = 0;
-            foreach (var item in _rpnExpression)
-            {
-                operation = _supportedOperations.Find(x => x.OperationCode == item);
-                if (operation != null)
-                {
-                    leftOp = float.Parse(result[^2]);
-                    rightOp = float.Parse(result[^1]);
-
-                    if (operation.OperationCode == "/" && rightOp == 0)
-                        throw new DivideByZeroException("You cannot divide by zero");
-
-                    result.RemoveAt(result.Count - 2);
-                    result.RemoveAt(result.Count - 1);
-
-                    result.Add(operation.Apply(leftOp, rightOp).ToString());
-                    continue;
-                }
-                else
-                    result.Add(item);
-            }
-
-            return float.Parse(result[0]);
         }
     }
 }
