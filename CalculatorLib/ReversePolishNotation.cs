@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CalculatorLib
 {
-    public class RPN : IParser
+    public class ReversePolishNotation : IParser
     {
         static readonly List<string> opLevelOne = new()
         {
@@ -28,9 +28,8 @@ namespace CalculatorLib
             new Division()
         };
 
-        public RPN() { }
-
-        public RPN(List<IOperation> operations)
+        public ReversePolishNotation() { }
+        public ReversePolishNotation(List<IOperation> operations)
         {
             _supportedOperations = operations;
         }

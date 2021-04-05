@@ -33,16 +33,15 @@ namespace Calculator
 
         static void Main(string[] args)
         {
-            RPN rpn = new();
+            ReversePolishNotation rpn = new();
             RCalculator MyCalc = new(rpn);
 
             string inputString = Console.ReadLine();
-
             /* Проверка выражения на верную структуру */
             if (Regex.IsMatch(inputString, @"[^()0-9*/+-]|[*/+-]{2,}|\A[*/+-]|[*/+-]\z"))
             {
                 Console.WriteLine("Invalid input");
-                Environment.Exit(13);
+                Environment.Exit(-1);
             }
 
             float result = 0;
