@@ -5,8 +5,6 @@ namespace CalculatorLib
 {
     public class RCalculator : ICalculator
     {
-        //private readonly IParser _parser;
-
         private readonly List<IOperation> _availableOperations;
 
         public RCalculator(List<IOperation> operations)
